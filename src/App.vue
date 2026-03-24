@@ -9,6 +9,8 @@ import TransactionList from "./components/TransactionList.vue";
 import SidebarCurrency from "./components/SidebarCurrency.vue";
 import QuickActions from "./components/QuickActions.vue";
 import ErrorBoundary from "./components/ErrorBoundary.vue";
+import AgentPanel from "./components/AgentPanel.vue";
+import { useAgents } from "./composables/useAgents";
 
 const showModal = ref(false);
 
@@ -29,6 +31,9 @@ const {
     deleteTransaction, 
     loadTransactions 
 } = useTransactions(currency, exchangeRates);
+
+const { results: agentResults, isRunning: agentsRunning, warningCount, runAgents } =
+    useAgents(transactions, currency, exchangeRates);
 
 const handleAddTransaction = (
     transactionData: Omit<import("./types").Transaction, "id" | "date">
@@ -190,6 +195,15 @@ onMounted(() => {
                                 :exchangeRates
                                 @delete="deleteTransaction"
                             />
+
+                            <div class="mt-6">
+                                <AgentPanel
+                                    :results="agentResults"
+                                    :is-running="agentsRunning"
+                                    :warning-count="warningCount"
+                                    @run="runAgents"
+                                />
+                            </div>
                         </template>
                     </ErrorBoundary>
                 </main>
